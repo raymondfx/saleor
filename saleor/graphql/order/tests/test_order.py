@@ -3210,7 +3210,9 @@ def test_order_cancel(
     assert not data["orderErrors"]
 
     mock_clean_order_cancel.assert_called_once_with(order)
-    mock_cancel_order.assert_called_once_with(order=order, user=staff_api_client.user)
+    mock_cancel_order.assert_called_once_with(
+        order=order, user=staff_api_client.user, manager=ANY
+    )
 
 
 @patch("saleor.graphql.order.mutations.orders.cancel_order")
@@ -3233,7 +3235,9 @@ def test_order_cancel_as_app(
     assert not data["orderErrors"]
 
     mock_clean_order_cancel.assert_called_once_with(order)
-    mock_cancel_order.assert_called_once_with(order=order, user=AnonymousUser())
+    mock_cancel_order.assert_called_once_with(
+        order=order, user=AnonymousUser(), manager=ANY
+    )
 
 
 def test_order_capture(
@@ -4346,7 +4350,9 @@ def test_order_bulk_cancel(
     assert data["count"] == expected_count
     assert not data["orderErrors"]
 
-    calls = [call(order=order, user=staff_api_client.user) for order in orders]
+    calls = [
+        call(order=order, user=staff_api_client.user, manager=ANY) for order in orders
+    ]
 
     mock_cancel_order.assert_has_calls(calls, any_order=True)
     mock_cancel_order.call_count == expected_count
@@ -4375,7 +4381,7 @@ def test_order_bulk_cancel_as_app(
     assert data["count"] == expected_count
     assert not data["orderErrors"]
 
-    calls = [call(order=order, user=AnonymousUser()) for order in orders]
+    calls = [call(order=order, user=AnonymousUser(), manager=ANY) for order in orders]
 
     mock_cancel_order.assert_has_calls(calls, any_order=True)
     assert mock_cancel_order.call_count == expected_count
